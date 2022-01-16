@@ -1,0 +1,6 @@
+---
+- name: Test Ansible
+  hosts: localhost
+  tasks:
+    - name: Test echo
+      shell: echo "Hello, my name is $(hostmane)!"
