@@ -36,6 +36,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision "ansible_local" do |ansible|
     ansible.playbook = "playbook.yaml"
     ansible.verbose = "v"
+    ansible.inventory_path = "/tmp/vagrant-ansible/inventory/vagrant_ansible_local_inventory"
   end
 end
 
