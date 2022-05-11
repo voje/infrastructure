@@ -1,0 +1,84 @@
+---
+# tasks file for kubeadmin_install
+- name: Load br_netfilter module
+  lineinfile:
+    create: true
+    path: /etc/modules-load.d/k8s.conf
+    line: "br_netfilter"
+
+- name: modprobe br_netfilter
+  modprobe:
+    name: br_netfilter
+    state: present
+
+- name: Enable processing of IP packets traversing bridges by iptables
+  sysctl:
+    name: "{{ item }}"
+    value: 1
+    state: present
+    reload: true
+    sysctl_set: true
+  with_items:
+  - net.bridge.bridge-nf-call-ip6tables
+  - net.bridge.bridge-nf-call-iptables
+
+- name: Remove unneeded docker packages
+  apt:
+    state: absent
+    pkg:
+    - docker
+    - docker-engine
+    - docker.io
+    - containerd
+    - runc
+
+- name: Insatll some packages
+  apt:
+    state: present
+    update_cache: true
+    pkg:
+    - ca-certificates
+    - curl
+    - gnupg
+    - lsb-release
+
+- name: Copy docker gpg key
+  tags: gpg
+  copy:
+    src: docker.gpg
+    dest: /tmp/docker.gpg
+
+- name: Remove current docker gpg key
+  tags: gpg
+  shell: "rm /usr/share/keyrings/docker-archive-keyring.gpg"
+
+- name: Add docker gpg key
+  tags: gpg
+  shell: "cat /tmp/docker.gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg"
+
+- name: Add docker repo
+  tags: docker
+  shell: > 
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+- name: Install official docker packages
+  tags: docker
+  apt:
+    update_cache: true
+    state: present
+    pkg: "{{ item }}"
+  with_items:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-compose-plugin
+
+- name: Add current user to docker group
+  tags: user
+  user:
+    name: "vagrant"
+    groups: docker
+
+- name: Relog
+  tags: user
+  meta: reset_connection 
