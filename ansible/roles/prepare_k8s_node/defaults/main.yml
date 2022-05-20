@@ -1,2 +1,6 @@
 ---
 # defaults file for kubeadmin_install
+kube_packages:
+- kubelet
+- kubeadm
+- kubectl
