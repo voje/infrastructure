@@ -1,5 +1,17 @@
 - hosts:
   - all
   become: true
+  tasks:
+  - import_role:
+      name: ./roles/prepare_k8s_node
+      tags: ""
+
+
   roles:
-  - ./roles/prepare_k8s_node
+  - name: /home/kristjan/git/ansible-role-docker
+    vars:
+      docker_daemon_config:
+        bip: "10.10.11.1/24"
+        default-address-pools:
+        - base: "10.11.0.0/16"
+          size: 24
