@@ -1,0 +1,15 @@
+# https://kubernetes.io/docs/tasks/tools/included/optional-kubectl-configs-bash-linux/
+---
+- name: Add kubectl autocompletion
+  shell: |
+    kubectl completion bash > ~/.kubectl.rc
+
+- name: Add kubectl alias
+  lineinfile:
+    path: ~/.bashrc
+    line: "{{ item }}"
+  with_items:
+  - ". ~/.kubectl.rc"
+  - "alias k=kubectl"
+  - "complete -F __start_kubectl k"
+  - "export KUBECONFIG=~/.kube/config"

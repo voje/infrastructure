@@ -1,9 +1,9 @@
 - hosts:
   - all
-  become: true
   tasks:
 
   - name: Install docker
+    become: true
     import_role:
       name: igor_nikiforov.docker
       # name: /home/voje/git/ansible-role-docker
@@ -20,11 +20,24 @@
       docker_users: ["vagrant"]
 
   - name: Prepare k8snode
+    become: true
     import_role:
       name: ./roles/prepare_k8s_node
     tags: ["prepare_k8s_node"]
 
-  - name: Install GoLang
-    import_role:
-      name: gantsign.golang
-    tags: ["install_golang"]
+#   - name: Install GoLang
+#     import_role:
+#       name: gantsign.golang
+#     tags: ["install_golang"]
+
+# unix:///var/run/cri-dockerd.sock
+# systemd is recommended for Kubeadm-based setups
+  - name: Install Docker shim
+    become: true
+    import_tasks: ./install_cri_docker.yaml
+    tags: ["install_cri_docker"]
+  
+  # Run as user
+  - name: Prepare kubectl
+    import_tasks: ./prepare_kubectl.yaml
+    tags: ["prepare_kubectl"]

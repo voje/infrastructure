@@ -57,3 +57,5 @@
     selection: hold
   with_items: "{{ kube_packages }}"
 
+- name: Disable swap
+  shell: swapoff -a
