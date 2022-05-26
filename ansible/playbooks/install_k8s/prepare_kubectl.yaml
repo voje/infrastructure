@@ -13,3 +13,9 @@
   - "alias k=kubectl"
   - "complete -F __start_kubectl k"
   - "export KUBECONFIG=~/.kube/config"
+
+- name: Install some packages
+  become: true
+  apt:
+    pkg:
+    - jq

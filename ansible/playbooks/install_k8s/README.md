@@ -59,4 +59,22 @@ volumeStatsAggPeriod: 0s
 ```
 
 ## Test pod
-k run -it --image=voje/toolbox:0.0.8 toolbox echo "hello"
+Untaint control-plane nodes
+```bash
+k taint node master node-role.kubernetes.io/control-plane:NoSchedule-
+k taint node master node-role.kubernetes.io/master:NoSchedule-
+```
+Run a test pod
+```bash
+k run --image=voje/toolbox:0.0.8 toolbox -- sleep inf
+```
+
+## Install kubectl locally (on vagrant host)
+From your host machine.   
+```bash
+ansible-playbook -i inventories/localhost playbooks/install_k8s/main.yaml --tags="install_user_k8s_packages,prepare_kubectl" 
+
+# Get the kubeconfig from vagrant and put it on your host machine
+echo "export KUBECONFIG=~/.kube/vagrant.config" >> ~/.bashrc 
+k get pods
+```
