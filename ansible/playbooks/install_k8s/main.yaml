@@ -6,7 +6,6 @@
     become: true
     import_role:
       name: igor_nikiforov.docker
-      # name: /home/voje/git/ansible-role-docker
     tags: ["install_docker"]
     vars:
       docker_install: true

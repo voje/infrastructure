@@ -1,4 +1,3 @@
 ---
 roles:
-- name: igor_nikiforov.docker
-- name: gantsign.golang
+# - name: igor_nikiforov.docker    # broken (keyring error)

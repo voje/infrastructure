@@ -1,13 +1,35 @@
-# kubeadm_init.yaml
+# Bring up cluster
+Manually for now
 
-## Bring up cluster
+Bring up cluster using kubeadm and cri-dockerd as runtime:
+```bash
 sudo kubeadm config images pull --cri-socket unix:///run/cri-dockerd.sock
 sudo kubeadm init --pod-network-cidr=10.10.0.0/16 --cri-socket unix:///run/cri-dockerd.sock
+```
 
-## Prepare kubectl
-mkdir -p $HOME/.kube
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown $(id -u):$(id -g) $HOME/.kube/config
+Untaint control-plane nodes:
+```bash
+k taint node master node-role.kubernetes.io/control-plane:NoSchedule-
+k taint node master node-role.kubernetes.io/master:NoSchedule-
+```
+
+Run a test pod
+```bash
+k run --image=voje/toolbox:0.0.8 toolbox -- sleep inf
+k get pods
+```
+
+## Install kubectl locally (on vagrant host)
+From your host machine.   
+```bash
+ansible-playbook -i inventories/localhost playbooks/install_k8s/main.yaml --tags="prepare_user_client"
+
+# Get the kubeconfig from vagrant and put it on your host machine
+echo "export KUBECONFIG=~/.kube/vagrant.config" >> ~/.bashrc 
+k get pods
+```
+
+# Other resources
 
 ## Example kubelet config
 ```yaml
@@ -56,25 +78,4 @@ staticPodPath: /etc/kubernetes/manifests
 streamingConnectionIdleTimeout: 0s
 syncFrequency: 0s
 volumeStatsAggPeriod: 0s
-```
-
-## Test pod
-Untaint control-plane nodes
-```bash
-k taint node master node-role.kubernetes.io/control-plane:NoSchedule-
-k taint node master node-role.kubernetes.io/master:NoSchedule-
-```
-Run a test pod
-```bash
-k run --image=voje/toolbox:0.0.8 toolbox -- sleep inf
-```
-
-## Install kubectl locally (on vagrant host)
-From your host machine.   
-```bash
-ansible-playbook -i inventories/localhost playbooks/install_k8s/main.yaml --tags="install_user_k8s_packages,prepare_kubectl" 
-
-# Get the kubeconfig from vagrant and put it on your host machine
-echo "export KUBECONFIG=~/.kube/vagrant.config" >> ~/.bashrc 
-k get pods
 ```

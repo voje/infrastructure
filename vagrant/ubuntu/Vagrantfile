@@ -13,11 +13,6 @@ Vagrant.configure("2") do |config|
   # argument is a set of non-required options.
   config.vm.synced_folder "./vagrant_data", "/vagrant_data"
 
-  config.vm.provision "shell", inline: <<-SHELL
-    apt-get update
-    apt-get -y upgrade
-  SHELL
-
   config.vm.define "master" do |master|
     master.vm.box = "generic/ubuntu2004"
     master.vm.hostname = "master"
