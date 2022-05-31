@@ -49,10 +49,12 @@
     tags: ["install_cri_docker"]
   
 
-  # Prepare userspace
+  # Prepare user client
   - name: Install user k8s packages
     become: true
-    tags: ["install_user_k8s_packages"]
+    tags:
+    - install_user_k8s_packages
+    - prepare_user_client
     import_role:
       name: ./roles/install_k8s_packages
     vars:
@@ -60,5 +62,13 @@
       - kubectl
 
   - name: Prepare kubectl
-    tags: ["prepare_kubectl"]
+    tags:
+    - prepare_kubectl
+    - prepare_user_client
     import_tasks: ./prepare_kubectl.yaml
+
+  - name: Install helm
+    tags: 
+    - install_helm
+    - prepare_user_client
+    import_tasks: ./install_helm.yaml
