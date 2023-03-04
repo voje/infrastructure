@@ -1,0 +1,23 @@
+# Tasks for helm installation
+---
+- name: Set some facts
+  set_fact:
+    helm_tar_path: /tmp/helm_release.tar.gz
+
+- name: Download helm release
+  get_url:
+    url: https://get.helm.sh/helm-v3.9.0-linux-amd64.tar.gz
+    dest: "{{ helm_tar_path }}"
+    force: true
+
+# Ansible unarchive has some problems, using shell
+- name: Unpack helm
+  shell: "tar xzvf {{ helm_tar_path }} -C /tmp"
+
+- name: Copy helm binary
+  become: true
+  copy:
+    src: /tmp/linux-amd64/helm
+    dest: /usr/local/bin/
+    mode: 0755
+    remote_src: true

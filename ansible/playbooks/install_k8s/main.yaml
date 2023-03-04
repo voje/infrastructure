@@ -1,0 +1,73 @@
+- hosts:
+  - all
+  tasks:
+
+  - name: Install docker
+    become: true
+    import_role:
+      name: igor_nikiforov.docker
+    tags: ["install_docker"]
+    vars:
+      docker_install: true
+      docker_version: latest
+      docker_daemon_config:
+        bip: "10.10.11.1/24"
+        default-address-pools:
+        - base: "10.11.0.0/16"
+          size: 24
+      docker_service_enabled: true
+      docker_users: ["vagrant"]
+
+  - name: Prepare k8s node
+    become: true
+    import_tasks: ./prepare_k8s_node.yaml
+    tags: ["prepare_k8s_node"]
+  
+  - name: Install node k8s packages
+    tags: ["install_node_k8s_packages"]
+    become: true
+    import_role:
+      name: ./roles/install_k8s_packages
+    vars:
+      kube_packages:
+      - kubelet
+      - kubeadm
+      - kubectl
+      hold: true
+
+#   - name: Install GoLang
+#     import_role:
+#       name: gantsign.golang
+#     tags: ["install_golang"]
+
+# unix:///var/run/cri-dockerd.sock
+# systemd is recommended for Kubeadm-based setups
+  - name: Install Docker shim
+    become: true
+    import_tasks: ./install_cri_docker.yaml
+    tags: ["install_cri_docker"]
+  
+
+  # Prepare user client
+  - name: Install user k8s packages
+    become: true
+    tags:
+    - install_user_k8s_packages
+    - prepare_user_client
+    import_role:
+      name: ./roles/install_k8s_packages
+    vars:
+      kube_packages:
+      - kubectl
+
+  - name: Prepare kubectl
+    tags:
+    - prepare_kubectl
+    - prepare_user_client
+    import_tasks: ./prepare_kubectl.yaml
+
+  - name: Install helm
+    tags: 
+    - install_helm
+    - prepare_user_client
+    import_tasks: ./install_helm.yaml

@@ -1,0 +1,30 @@
+---
+- name: Install apt packages
+  apt:
+    update_cache: true
+    pkg:
+    - apt-transport-https
+    - ca-certificates
+
+- name: Get kubernetes gpg key
+  get_url:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    dest: /usr/share/keyrings/kubernetes-archive-keyring.gpg 
+
+- name: Add k8s repo
+  lineinfile:
+    create: true
+    line: "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main"
+    path: "/etc/apt/sources.list.d/kubernetes.list"
+
+- name: Install k8s packages
+  apt:
+    update_cache: true
+    pkg: "{{ kube_packages }}"
+  
+- name: Hold packages
+  dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  with_items: "{{ kube_packages }}"
+  when: hold

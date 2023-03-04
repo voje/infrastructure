@@ -1,0 +1,7 @@
+# cd ../vagrant/k8s/; vagrant ssh-config > ssh.config; cd -
+[masters]
+master
+
+[workers]
+worker-1
+worker-2
