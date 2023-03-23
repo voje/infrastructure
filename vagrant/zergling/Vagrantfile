@@ -3,6 +3,10 @@
 
 Vagrant.configure("2") do |config|
 
+  # On windows, permissions get messed up
+  config.ssh.private_key_path = "~/.ssh/id_ecdsa"
+
+
   config.vm.define "zergling" do |zergling|
 
     zergling.vm.box = "generic/ubuntu2204"
@@ -10,7 +14,11 @@ Vagrant.configure("2") do |config|
     # Create a private network, which allows host-only access to the machine
     # using a specific IP.
     # Using IPs on the WSL switch subnet.
-    # zergling.vm.network "private_network"
+
+    # wsl2 + Virtualbox
+    # zergling.vm.network "private_network", type: "dhcp",
+    #   virtualbox__intnet: true
+
 
     # Provider-specific zerglinguration so you can fine-tune various
     # backing providers for Vagrant. These expose provider-specific options.
@@ -19,6 +27,7 @@ Vagrant.configure("2") do |config|
     zergling.vm.provider "virtualbox" do |vb|
       vb.memory = "4096"
       vb.cpus = 2
+
     end
 
     zergling.vm.provider "libvirt" do |libvirt|
