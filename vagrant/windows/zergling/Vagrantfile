@@ -1,0 +1,37 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+#
+# Ok, so you are using Virtualbox on Windows and 
+# want to connect from WSL.  
+# I'm sorry.   
+#
+# Sane way to do this is to run a generic Virtualbox 
+# VM, open Virtualbox, click on VM's network settings, 
+# change Network Adapter 1 from NAT to Bridged Adapter.  
+# Pick your Windows main adapter (Realtek Gaming GbE...)
+#
+# Log into the VM (GUI) and find out its IP - the VM should 
+# get a local network IP.   
+#
+# Add the IP to your WSL ssh config, inject ssh key
+# via ssh-copy-id
+#
+# From here on, you can use the box. Make sure not to destroy it 
+# unless you want to set up networking again.   
+#
+
+Vagrant.configure("2") do |config|
+  config.vm.define "zergling" do |zergling|
+
+    zergling.vm.box = "generic/ubuntu2204"
+    zergling.vm.hostname = "zergling.local"
+
+    zergling.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+      vb.cpus = 1
+    end
+  end
+
+end
+

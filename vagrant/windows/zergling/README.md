@@ -8,10 +8,12 @@ Vagrant works fine algouth connecting is not pleasant.
 Virtualbox starts listening on 127.0.0.1; we need to manually set network 
 adapter to "Connected adapter", which gives our VM an IP on our local network.   
 
+We can change the adapter to:
+Realteh Gaming GbE Family Controller
+This is the main adapter on windows, the VM gets a LAN IP.   
+
 Then we need to change the ssh key permissions because windows adds 777 to the 
 key.   
-
-sigh...
 
 ## HyperV on Windows
 (old)
